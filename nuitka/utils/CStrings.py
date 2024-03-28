@@ -26,7 +26,7 @@ def _encodePythonStringToC(value):
     """
     assert type(value) is bytes, type(value)
 
-    result = [] # use list
+    result = []
     octal = False
 
     for c in value:
@@ -67,6 +67,12 @@ def encodePythonUnicodeToC(value):
 
 def encodePythonStringToC(value):
     """Encode bytes, so that it gives a C string literal."""
+
+    # Not all compilers allow arbitrary large C strings, therefore split it up
+    # into chunks. That changes nothing to the meanings, but is easier on the
+    # parser. Currently only MSVC is known to have this issue, but the
+    # workaround can be used universally.
+    
     result = [_encodePythonStringToC(value[:16000])]
     value = value[16000:]
 
