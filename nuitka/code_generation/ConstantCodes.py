@@ -1,6 +1,7 @@
 #     Copyright 2024, Kay Hayen, mailto:kay.hayen@gmail.com find license text at end of file
 
 
+from functools import lru_cache
 """ Low level constant code generation.
 
 This deals with constants, there creation, there access, and some checks about
@@ -175,6 +176,7 @@ def addDistributionMetadataValue(name, distribution):
     metadata_values[name] = (package_name, metadata, entry_points)
 
 
+@lru_cache(maxsize=None)
 def getDistributionMetadataValues():
     return sorted(tuple(metadata_values.items()))
 
