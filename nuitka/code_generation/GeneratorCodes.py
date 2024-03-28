@@ -33,18 +33,14 @@ from .YieldCodes import getYieldReturnDispatchCode
 def _getGeneratorMakerIdentifier(function_identifier):
     return "MAKE_GENERATOR_" + function_identifier
 
-
 def getGeneratorObjectDeclCode(function_identifier, closure_variables):
-    generator_creation_args = getFunctionCreationArgs(
-        defaults_name=None,
-        kw_defaults_name=None,
-        annotations_name=None,
-        closure_variables=closure_variables,
-        tstate=False,
-    )
+    generator_creation_args = []
 
+    if closure_variables:
+        generator_creation_args.append("struct Nuitka_CellObject **closure")
+    
     return template_genfunc_yielder_maker_decl % {
-        "generator_maker_identifier": _getGeneratorMakerIdentifier(function_identifier),
+        "generator_maker_identifier": "MAKE_GENERATOR_" + function_identifier,
         "generator_creation_args": ", ".join(generator_creation_args),
     }
 
