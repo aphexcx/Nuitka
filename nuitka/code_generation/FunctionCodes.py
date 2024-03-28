@@ -39,8 +39,6 @@ from .VariableCodes import (
     decideLocalVariableCodeType,
     getLocalVariableDeclaration,
 )
-
-
 def getFunctionCreationArgs(
     defaults_name, kw_defaults_name, annotations_name, closure_variables, tstate
 ):
