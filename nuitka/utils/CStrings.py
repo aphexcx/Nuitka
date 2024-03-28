@@ -19,8 +19,6 @@ def _identifierEncode(c):
 
 
 codecs.register_error("c_identifier", _identifierEncode)
-
-
 def _encodePythonStringToC(value):
     """Encode a string, so that it gives a C string literal.
 
@@ -28,34 +26,25 @@ def _encodePythonStringToC(value):
     """
     assert type(value) is bytes, type(value)
 
-    result = ""
+    result = [] # use list
     octal = False
 
     for c in value:
-        if str is bytes:
-            cv = ord(c)
-        else:
-            cv = c
+        cv = ord(c) if str is bytes else c
 
         if c in b'\\\t\r\n"?':
-            result += r"\%03o" % cv
-
+            result.append(r"\%03o" % cv)
             octal = True
         elif 32 <= cv <= 127:
             if octal and c in b"0123456789":
-                result += '" "'
-
-            result += chr(cv)
-
+                result.append('" "')
+            result.append(chr(cv))
             octal = False
         else:
-            result += r"\%o" % cv
-
+            result.append(r"\%o" % cv)
             octal = True
 
-    result = result.replace('" "\\', "\\")
-
-    return '"%s"' % result
+    return '"' + ''.join(result).replace('" "\\', "\\") + '"'
 
 
 def encodePythonUnicodeToC(value):
@@ -76,24 +65,17 @@ def encodePythonUnicodeToC(value):
 
     return 'L"%s"' % result
 
-
 def encodePythonStringToC(value):
     """Encode bytes, so that it gives a C string literal."""
-
-    # Not all compilers allow arbitrary large C strings, therefore split it up
-    # into chunks. That changes nothing to the meanings, but is easier on the
-    # parser. Currently only MSVC is known to have this issue, but the
-    # workaround can be used universally.
-
-    result = _encodePythonStringToC(value[:16000])
+    result = [_encodePythonStringToC(value[:16000])]
     value = value[16000:]
 
     while value:
-        result += " "
-        result += _encodePythonStringToC(value[:16000])
+        result.append(" ")
+        result.append(_encodePythonStringToC(value[:16000]))
         value = value[16000:]
 
-    return result
+    return ''.join(result)
 
 
 def decodeCStringToPython(value):
