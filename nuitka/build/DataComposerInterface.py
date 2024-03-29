@@ -18,10 +18,8 @@ from nuitka.utils.Json import loadJsonFromFilename
 # Indicate not done with -1
 _data_composer_size = None
 _data_composer_stats = None
-
-
 def getDataComposerReportValues():
-    return OrderedDict(blob_size=_data_composer_size, stats=_data_composer_stats)
+    return {"blob_size": _data_composer_size, "stats": _data_composer_stats}
 
 
 def runDataComposer(source_dir):
