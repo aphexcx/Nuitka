@@ -1,6 +1,7 @@
 #     Copyright 2024, Kay Hayen, mailto:kay.hayen@gmail.com find license text at end of file
 
 
+import os
 """ Basics for Nuitka tools.
 
 """
@@ -18,6 +19,7 @@ my_abs_path = os.path.abspath(__file__)
 
 
 def getHomePath():
+    my_abs_path = os.path.abspath(__file__)
     return os.path.normpath(os.path.join(os.path.dirname(my_abs_path), "..", ".."))
 
 
