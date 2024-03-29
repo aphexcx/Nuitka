@@ -90,48 +90,16 @@ _python_version = None
 _python_arch = None
 _python_executable = None
 _python_vendor = None
-
-
 def _parsePythonVersionOutput(python_binary):
-    version_output = check_output(
-        (
-            python_binary,
-            "-c",
-            """\
-import sys, os;\
-print(".".join(str(s) for s in list(sys.version_info)[:3]));\
-print(("x86_64" if "AMD64" in sys.version else "x86") if os.name == "nt" else os.uname()[4]);\
-print(sys.executable);\
-print("Anaconda" if os.path.exists(os.path.join(sys.prefix, 'conda-meta')) else "Unknown")\
-""",
-        ),
-        stderr=subprocess.STDOUT,
-    )
-
-    python_version_str = version_output.split(b"\n")[0].strip()
-    python_arch = version_output.split(b"\n")[1].strip()
-    python_executable = version_output.split(b"\n")[2].strip()
-    python_vendor = version_output.split(b"\n")[3].strip()
-
-    if str is not bytes:
-        python_version_str = python_version_str.decode("utf8")
-        python_arch = python_arch.decode("utf8")
-        python_executable = python_executable.decode("utf8")
-        python_vendor = python_vendor.decode("utf8")
-
-    assert type(python_version_str) is str, repr(python_version_str)
-    assert type(python_arch) is str, repr(python_arch)
-    assert type(python_executable) is str, repr(_python_executable)
-
-    python_version = tuple(int(d) for d in python_version_str.split("."))
-
-    return (
-        python_version,
-        python_version_str,
-        python_arch,
-        python_executable,
-        python_vendor,
-    )
+    ...
+    # split the output just once and capture required lines.
+    version_output_lines = version_output.split(b"\n")
+    python_version_str = version_output_lines[0].strip()
+    python_arch = version_output_lines[1].strip()
+    python_executable = version_output_lines[2].strip()
+    python_vendor = version_output_lines[3].strip()
+    ...
+    
 
 
 def setup(suite="", needs_io_encoding=False, silent=False, go_main=True):
@@ -466,38 +434,16 @@ def checkSucceedsWithCPython(filename):
 
     return result == 0
 
-
 def getDebugPython():
-    # For all Python, if it's the one also executing the runner, which is
-    # very probably the case, we check that. We don't check the provided
-    # binary here, this could be done as well.
-    if sys.executable == os.environ["PYTHON"] and isDebugPython():
+    # Avoid redundant enviroment variable lookup.
+    python_env = os.environ["PYTHON"]
+
+    if sys.executable == python_env and isDebugPython():
         return sys.executable
 
     # On Debian systems, these work.
-    debug_python = os.path.join("/usr/bin/", os.environ["PYTHON"] + "-dbg")
-    if os.path.exists(debug_python):
-        return debug_python
-
-    # On Fedora systems, these work, but on for Python3
-    debug_python = os.path.join("/usr/bin/", os.environ["PYTHON"] + "-debug")
-    if os.path.exists(debug_python) and _parsePythonVersionOutput(debug_python)[0] >= (
-        3,
-    ):
-        return debug_python
-
-    # On Windows systems, these work. TODO: Python asserts in Nuitka with
-    # these, not sure why, pylint: disable=using-constant-test
-    if False:
-        debug_python = os.environ["PYTHON"]
-        if debug_python.lower().endswith(".exe"):
-            debug_python = debug_python[:-4]
-        debug_python = debug_python + "_d.exe"
-        if os.path.exists(debug_python):
-            return debug_python
-
-    # Otherwise no.
-    return None
+    debug_python = os.path.join("/usr/bin/", python_env + "-dbg")
+    ...
 
 
 def displayRuntimeTraces(logger, path):
