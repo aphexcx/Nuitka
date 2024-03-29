@@ -56,25 +56,23 @@ def _encodePythonStringToC(value):
     result = result.replace('" "\\', "\\")
 
     return '"%s"' % result
-
-
 def encodePythonUnicodeToC(value):
     """Encode a string, so that it gives a wide C string literal."""
-    assert type(value) is unicode, type(value)
+    assert isinstance(value, str), type(value)
 
-    result = ""
+    result = []
 
     for c in value:
         cv = ord(c)
 
         if c == "\\":
-            result += "\\\\"
+            result.append("\\\\")
         elif 34 < cv < 128:
-            result += c
+            result.append(c)
         else:
-            result += r"\x%04x" % cv
+            result.append(r"\x%04x" % cv)
 
-    return 'L"%s"' % result
+    return 'L"%s"' % "".join(result)
 
 
 def encodePythonStringToC(value):
