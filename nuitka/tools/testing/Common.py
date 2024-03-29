@@ -609,33 +609,16 @@ def reenablePrinting():
 
 
 _debug_python = isDebugPython()
-
-
 def getTotalReferenceCount():
     if _debug_python:
         gc.collect()
         return sys.gettotalrefcount()
     else:
         gc.collect()
+        result = 0
         all_objects = gc.get_objects()
-
-        # Sum object reference twice, once without the sum value type, then switch
-        # the type, and use the type used to avoid the integers before that.
-        result = 0.0
         for obj in all_objects:
-            if type(obj) is float:
-                continue
-
             result += sys.getrefcount(obj)
-
-        result = int(result)
-
-        for obj in all_objects:
-            if type(obj) is not float:
-                continue
-
-            result += sys.getrefcount(obj)
-
         return result
 
 
