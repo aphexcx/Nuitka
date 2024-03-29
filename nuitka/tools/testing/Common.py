@@ -1853,10 +1853,8 @@ def getPythonSysPath():
 _web_server_process = None
 _web_server_port = 27272
 _web_server_hostname = "localhost"
-
-
-def getLocalWebServerUrl():
-    return "http://%s:%d" % (_web_server_hostname, _web_server_port)
+def getLocalWebServerUrl() -> str:
+    return f"http://{_web_server_hostname}:{_web_server_port}"
 
 
 def getLocalWebServerDir(base_dir):
