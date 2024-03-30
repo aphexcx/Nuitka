@@ -74,8 +74,8 @@ class SearchModeBase(object):
         # Virtual method, pylint: disable=no-self-use
         sys.exit(message)
 
-    def isCoverage(self):
-        # Virtual method, pylint: disable=no-self-use
+    @staticmethod
+    def isCoverage():
         return False
 
     def onErrorDetected(self, message):
